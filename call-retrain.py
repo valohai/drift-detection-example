@@ -25,45 +25,11 @@ resp = requests.request(
         ],
         "nodes": [
             {
-                "name": "evaluation",
-                "type": "execution",
-                "template": {
-                    "environment": "017d329a-e56f-d451-040b-ccb895513c40",
-                    "commit": "~4bfc31b2e318f91a624078c87546f0c283f967b75dd5f7812f4f17ee7b9a8a5a",
-                    "step": "evaluation",
-                    "image": "ultralytics/yolov5",
-                    "command": "pip install valohai-utils\npython evaluation.py {parameters}",
-                    "inputs": {
-                        "model": [
-                            "datum://model-current-best"
-                        ],
-                        "data_yaml": [
-                            "datum://data_yaml"
-                        ],
-                        "valid": [
-                            "dataset://drift-demo-ships-aerial/dev_valid"
-                        ],
-                        "test": [
-                            "dataset://drift-demo-ships-aerial/dev_test"
-                        ]
-                    },
-                    "parameters": {},
-                    "runtime_config": {},
-                    "runtime_config_preset": "",
-                    "inherit_environment_variables": True,
-                    "environment_variable_groups": [],
-                    "tags": [],
-                    "time_limit": 0,
-                    "environment_variables": {}
-                },
-                "on_error": "stop-all"
-            },
-            {
                 "name": "preprocess",
                 "type": "execution",
                 "template": {
                     "environment": "017d329a-e56f-d451-040b-ccb895513c40",
-                    "commit": "~4bfc31b2e318f91a624078c87546f0c283f967b75dd5f7812f4f17ee7b9a8a5a",
+                    "commit": "0aadea924a866f2fd95b5ea304c2a8f7fd0cc189",
                     "step": "prepare_data",
                     "image": "ultralytics/yolov5",
                     "command": "pip install valohai-utils\npython preprocess.py {parameters}",
@@ -93,7 +59,7 @@ resp = requests.request(
                 "type": "execution",
                 "template": {
                     "environment": "017d329a-e56f-d451-040b-ccb895513c40",
-                    "commit": "~4bfc31b2e318f91a624078c87546f0c283f967b75dd5f7812f4f17ee7b9a8a5a",
+                    "commit": "0aadea924a866f2fd95b5ea304c2a8f7fd0cc189",
                     "step": "train_model",
                     "image": "ultralytics/yolov5",
                     "command": "pip install valohai-utils\npython train.py {parameters}",
@@ -126,13 +92,46 @@ resp = requests.request(
                     "environment_variables": {}
                 },
                 "on_error": "stop-all"
+            },
+            {
+                "name": "evaluation",
+                "type": "execution",
+                "template": {
+                    "environment": "017d329a-e56f-d451-040b-ccb895513c40",
+                    "commit": "0aadea924a866f2fd95b5ea304c2a8f7fd0cc189",
+                    "step": "evaluation",
+                    "image": "ultralytics/yolov5",
+                    "command": "pip install valohai-utils\npython evaluation.py {parameters}",
+                    "inputs": {
+                        "model": [
+                            "datum://model-current-best"
+                        ],
+                        "data_yaml": [
+                            "datum://data_yaml"
+                        ],
+                        "valid": [
+                            "dataset://drift-demo-ships-aerial/dev_valid"
+                        ],
+                        "test": [
+                            "dataset://drift-demo-ships-aerial/dev_test"
+                        ]
+                    },
+                    "parameters": {},
+                    "runtime_config": {},
+                    "runtime_config_preset": "",
+                    "inherit_environment_variables": True,
+                    "environment_variable_groups": [],
+                    "tags": [],
+                    "time_limit": 0,
+                    "environment_variables": {}
+                },
+                "on_error": "stop-all"
             }
         ],
         "project": "018c8779-9475-09e1-d481-e295ab4de428",
         "tags": [],
-        "copy_source": "018cf921-0e19-c1a8-a21f-6ed7c193212e",
         "parameters": {},
-        "title": "train-val-pipeline (copy)"
+        "title": "train-val-pipeline"
     },
 )
 if resp.status_code == 400:
