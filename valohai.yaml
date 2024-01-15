@@ -1,0 +1,159 @@
+- step:
+    name: prepare_data
+    environment: staging-aws-eu-west-1-p3-2xlarge
+    image: ultralytics/yolov5
+    command:
+      - pip install valohai-utils
+      - python preprocess.py {parameters}
+    inputs:
+      - name: dataset
+        default: s3://valohai-demo-library-data/drift-detection/ships-aerial-images.zip
+    parameters:
+      - name: train_size
+        default: 15
+        type: integer
+        description: total train dataset size
+      - name: valid_size
+        default: 10
+        type: integer
+        description: total validation dataset size
+      - name: test_size
+        default: 10
+        type: integer
+        description: total test dataset size
+      - name: image_size
+        default: 768
+        type: integer
+
+- step:
+    name: train_model
+    environment: staging-aws-eu-west-1-p3-2xlarge
+    image: ultralytics/yolov5
+    command:
+      - pip install valohai-utils
+      - python train.py {parameters}
+    inputs:
+      - name: train
+        default: dataset://drift-demo-ships-aerial/dev_train
+      - name: test
+        default: dataset://drift-demo-ships-aerial/dev_test
+      - name: valid
+        default: dataset://drift-demo-ships-aerial/dev_valid
+    parameters:
+      - name: yolo_model_name
+        default: 'yolov8x.pt'
+        type: string
+      - name: epochs
+        default: 3
+        type: integer
+        description: total training epochs
+      - name: batch_size
+        default: 8
+        type: integer
+        description: total batch size
+      - name: image_size
+        default: 768
+        type: integer
+      - name: optimizer
+        default: "SGD"
+        type: string
+        description: optimizer
+      - name: seed
+        default: 42
+        type: integer
+      - name: project
+        default: /valohai/outputs/
+        type: string
+        description: save to project/name
+
+- step:
+    name: evaluation
+    image: ultralytics/yolov5
+    environment: staging-aws-eu-west-1-p3-2xlarge
+    command:
+      - pip install valohai-utils
+      - python evaluation.py {parameters}
+    inputs:
+      - name: model
+        default: datum://model-current-best
+      - name: data_yaml
+        default: datum://data_yaml
+      - name: valid
+        default: dataset://drift-demo-ships-aerial/dev_valid
+      - name: test
+        default: dataset://drift-demo-ships-aerial/dev_test
+
+- step:
+    name: inference
+    image: ultralytics/yolov5
+    environment: staging-aws-eu-west-1-p2-xlarge
+    command:
+      - pip install "whylogs[image,viz]"
+      - pip install valohai-utils
+      - python inference.py {parameters}
+    inputs:
+      - name: data
+        default: s3://valohai-demo-library-data/drift-detection/drifted_colorspace.zip
+      - name: ref_data
+        default: dataset://drift-demo-ships-aerial/dev_valid
+      - name: model
+        default: datum://model-current-best
+    environment-variables:
+      - name: WHYLABS_DEFAULT_ORG_ID
+        default: "org-tXvte7"
+      - name: WHYLABS_DEFAULT_DATASET_ID
+        default: "model-1"
+      - name: WHYLABS_API_KEY
+        default: "u5LZpXVTtX.XkCsbQXMCj80iS9x6cVAqDsPdo4SKvS599h7PYFfS4isG9S6oDuqO:org-tXvte7"
+    parameters:
+      - name: drift
+        default: 0
+        type: integer
+
+- step:
+    name: call-retrain
+    image: ultralytics/yolov5
+    environment: staging-aws-eu-west-1-p3-2xlarge
+    command:
+      - python call-retrain.py {parameters}
+    parameters:
+    - name: drift
+      default: 0
+      type: integer
+
+- pipeline:
+    name: train-val-pipeline
+    nodes:
+      - name: preprocess
+        type: execution
+        step: prepare_data
+      - name: training
+        type: execution
+        step: train_model
+      - name: evaluation
+        type: execution
+        step: evaluation
+    edges:
+      - [preprocess.parameter.image_size, training.parameter.image_size]
+      - [training.output.*best.pt, evaluation.input.model]
+
+- pipeline:
+    name: drift-detection-pipeline
+    nodes:
+      - name: drift-detect
+        type: execution
+        step: inference
+        actions:
+          - when: node-complete
+            if: metadata.drift == 0
+            then: stop-pipeline
+      - name: call-retrain
+        type: execution
+        step: call-retrain
+        actions:
+          - when: node-starting
+            then: require-approval
+    edges:
+      - [drift-detect.parameter.drift, call-retrain.parameter.drift]
+
+
