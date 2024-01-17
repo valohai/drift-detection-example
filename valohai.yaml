@@ -103,11 +103,9 @@
         default: "org-tXvte7"
       - name: WHYLABS_DEFAULT_DATASET_ID
         default: "model-1"
-      - name: WHYLABS_API_KEY
-        default: "u5LZpXVTtX.XkCsbQXMCj80iS9x6cVAqDsPdo4SKvS599h7PYFfS4isG9S6oDuqO:org-tXvte7"
     parameters:
-      - name: drift
-        default: 0
+      - name: save_results
+        default: 1
         type: integer
 
 - step:
@@ -117,7 +115,7 @@
     command:
       - python call-retrain.py {parameters}
     parameters:
-    - name: drift
+    - name: save_results
       default: 0
       type: integer
 
@@ -145,7 +143,7 @@
         step: inference
         actions:
           - when: node-complete
-            if: metadata.drift == 0
+            if: metadata.drift <= 1
             then: stop-pipeline
       - name: call-retrain
         type: execution
@@ -154,6 +152,6 @@
           - when: node-starting
             then: require-approval
     edges:
-      - [drift-detect.parameter.drift, call-retrain.parameter.drift]
+      - [drift-detect.parameter.save_results, call-retrain.parameter.save_results]
 
 

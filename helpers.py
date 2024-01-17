@@ -15,3 +15,10 @@ def get_run_identification():
         project_name = 'test'
         exec_id = str(int(time.time()))
     return project_name, exec_id
+
+def unpack_dataset(dataset_path, output_to='./unpacked_dataset'):
+    import zipfile
+    with zipfile.ZipFile(f"{dataset_path}", "r") as zip_ref:
+        zip_ref.extractall(output_to)
+
+    return output_to

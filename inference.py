@@ -11,7 +11,7 @@ from PIL import Image
 from ultralytics import YOLO
 import valohai
 
-from preprocess import unpack_dataset
+from helpers import unpack_dataset
 
 
 def inference_yolo(data_path):
@@ -42,12 +42,13 @@ def inference_yolo(data_path):
         else:
             inference_profile = inference_profile.merge(profile_view)
 
-        # Save the result to Valohai
-        image_name = os.path.basename(path)
-        im_array = res.plot()  # plot a BGR numpy array of predictions
-        im = Image.fromarray(im_array[..., ::-1])  # RGB PIL image
-        out_path = valohai.outputs().path(image_name[:-4] + '_result.jpg')
-        im.save(out_path)  # save imag
+        if valohai.parameters("save_results").value != 1:
+            # Save the result to Valohai
+            image_name = os.path.basename(path)
+            im_array = res.plot()  # plot a BGR numpy array of predictions
+            im = Image.fromarray(im_array[..., ::-1])  # RGB PIL image
+            out_path = valohai.outputs().path(image_name[:-4] + '_result.jpg')
+            im.save(out_path)  # save imag
 
     print(f'Inference profile {len(results)} images')
     writer = WhyLabsWriter()
@@ -122,9 +123,9 @@ def print_report_results(scores):
 
 
 if __name__ == '__main__':
+    # Get dataset for the inference
     dataset_packed = valohai.inputs('data').path(process_archives=False)
     data_path = '/valohai/repository/data'
-
     unpack_dataset(dataset_packed, data_path)
 
     print('----Running YOLO inference')

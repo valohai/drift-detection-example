@@ -3,7 +3,7 @@ import json
 import shutil
 import os
 import random
-from helpers import get_run_identification
+from helpers import get_run_identification, unpack_dataset
 import valohai
 import cv2
 
@@ -63,15 +63,6 @@ def preprocess(img, img_size=608):
     # img = cv2.resize(img, (img_size, img_size))
     # img = img / 255.
     return img
-
-
-def unpack_dataset(dataset_path, output_to='./unpacked_dataset'):
-    import zipfile
-    with zipfile.ZipFile(f"{dataset_path}", "r") as zip_ref:
-        zip_ref.extractall(output_to)
-
-    return output_to
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Dataset parameters for ship aerial images")

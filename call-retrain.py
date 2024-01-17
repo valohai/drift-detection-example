@@ -1,9 +1,12 @@
+import os
+
 import requests
 
+api_token = os.environ.get("VALOHAI_API_TOKEN")
 resp = requests.request(
     url="https://staging.valohai.com/api/v0/pipelines/",
     method="POST",
-    headers={"Authorization": "Token L2kXt2Frkj5NBItvUH92zhly7B2GjRp24nj2yLFv"},
+    headers={"Authorization": f"Token {api_token}"},
     json={
         "edges": [
             {
