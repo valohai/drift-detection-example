@@ -4,7 +4,7 @@
     image: ultralytics/yolov5
     command:
       - pip install valohai-utils
-      - python preprocess.py {parameters}
+      - python data-preprocess.py {parameters}
     inputs:
       - name: dataset
         default: s3://valohai-demo-library-data/drift-detection/ships-aerial-images.zip
