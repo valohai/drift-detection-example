@@ -119,3 +119,16 @@ For example, to run the three-trainings-pipeline-w-deployment pipeline, use the 
 ```bash
 vh pipeline run train-val-pipeline --adhoc
 ```
+
+## FAQ
+### 1. Working with secrets. 
+In this project you need to use private tokens in two places: to use WhyLabs and to use Valohai API in `call-retrain.py`.
+
+Note that you should never include the token in your version control. Instead of pasting it directly into your code, we recommend storing it as a secret environment variable. 
+
+You can add environment variables in a couple of ways in Valohai.
+- Add the environment variable when creating an execution from the UI (Create Execution -> Environment Variables). The env variable are only available in the execution where it was created.
+- Add the project environment variable (Project Settings -> "Environment Variables" tab -> Check "Secret" checkbox). In this case, the env variable will be available for all executions of the project.
+
+### 2. Other monitoring tools.
+WhyLabs is presented here as one of the options to detect the data drift for the image data. Valohai does not have limitations for any other monitoring tools like EvidentlyAI, Fiddler, Censius, NeptuneAI etc.  
