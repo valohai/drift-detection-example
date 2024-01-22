@@ -15,7 +15,7 @@ resp = requests.request(
                 "source_type": "parameter",
                 "target_node": "training",
                 "target_type": "parameter",
-                "target_key": "image_size"
+                "target_key": "image_size",
             },
             {
                 "source_node": "training",
@@ -23,8 +23,8 @@ resp = requests.request(
                 "source_type": "output",
                 "target_node": "evaluation",
                 "target_type": "input",
-                "target_key": "model"
-            }
+                "target_key": "model",
+            },
         ],
         "nodes": [
             {
@@ -38,14 +38,14 @@ resp = requests.request(
                     "command": "pip install valohai-utils\npython preprocess.py {parameters}",
                     "inputs": {
                         "dataset": [
-                            "s3://valohai-demo-library-data/drift-detection/ships-aerial-images.zip"
-                        ]
+                            "s3://valohai-demo-library-data/drift-detection/ships-aerial-images.zip",
+                        ],
                     },
                     "parameters": {
                         "train_size": 15,
                         "valid_size": 10,
                         "test_size": 10,
-                        "image_size": 768
+                        "image_size": 768,
                     },
                     "runtime_config": {},
                     "runtime_config_preset": "",
@@ -53,9 +53,9 @@ resp = requests.request(
                     "environment_variable_groups": [],
                     "tags": [],
                     "time_limit": 0,
-                    "environment_variables": {}
+                    "environment_variables": {},
                 },
-                "on_error": "stop-all"
+                "on_error": "stop-all",
             },
             {
                 "name": "training",
@@ -67,15 +67,9 @@ resp = requests.request(
                     "image": "ultralytics/yolov5",
                     "command": "pip install valohai-utils\npython train.py {parameters}",
                     "inputs": {
-                        "train": [
-                            "dataset://drift-demo-ships-aerial/dev_train"
-                        ],
-                        "test": [
-                            "dataset://drift-demo-ships-aerial/dev_test"
-                        ],
-                        "valid": [
-                            "dataset://drift-demo-ships-aerial/dev_valid"
-                        ]
+                        "train": ["dataset://drift-demo-ships-aerial/dev_train"],
+                        "test": ["dataset://drift-demo-ships-aerial/dev_test"],
+                        "valid": ["dataset://drift-demo-ships-aerial/dev_valid"],
                     },
                     "parameters": {
                         "yolo_model_name": "yolov8x.pt",
@@ -84,7 +78,7 @@ resp = requests.request(
                         "image_size": 768,
                         "optimizer": "SGD",
                         "seed": 42,
-                        "project": "/valohai/outputs/"
+                        "project": "/valohai/outputs/",
                     },
                     "runtime_config": {},
                     "runtime_config_preset": "",
@@ -92,9 +86,9 @@ resp = requests.request(
                     "environment_variable_groups": [],
                     "tags": [],
                     "time_limit": 0,
-                    "environment_variables": {}
+                    "environment_variables": {},
                 },
-                "on_error": "stop-all"
+                "on_error": "stop-all",
             },
             {
                 "name": "evaluation",
@@ -106,18 +100,10 @@ resp = requests.request(
                     "image": "ultralytics/yolov5",
                     "command": "pip install valohai-utils\npython evaluation.py {parameters}",
                     "inputs": {
-                        "model": [
-                            "datum://model-current-best"
-                        ],
-                        "data_yaml": [
-                            "datum://data_yaml"
-                        ],
-                        "valid": [
-                            "dataset://drift-demo-ships-aerial/dev_valid"
-                        ],
-                        "test": [
-                            "dataset://drift-demo-ships-aerial/dev_test"
-                        ]
+                        "model": ["datum://model-current-best"],
+                        "data_yaml": ["datum://data_yaml"],
+                        "valid": ["dataset://drift-demo-ships-aerial/dev_valid"],
+                        "test": ["dataset://drift-demo-ships-aerial/dev_test"],
                     },
                     "parameters": {},
                     "runtime_config": {},
@@ -126,15 +112,15 @@ resp = requests.request(
                     "environment_variable_groups": [],
                     "tags": [],
                     "time_limit": 0,
-                    "environment_variables": {}
+                    "environment_variables": {},
                 },
-                "on_error": "stop-all"
-            }
+                "on_error": "stop-all",
+            },
         ],
         "project": "018c8779-9475-09e1-d481-e295ab4de428",
         "tags": [],
         "parameters": {},
-        "title": "train-val-pipeline"
+        "title": "train-val-pipeline",
     },
 )
 if resp.status_code == 400:
