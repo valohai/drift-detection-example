@@ -5,6 +5,10 @@ from ultralytics import YOLO
 
 
 def create_data_yaml():
+    """
+    the data.yaml is required for the ultralytics to train and predict
+    we also save it with valohai alias to nicely access it on evaluation step
+    """
     import yaml
 
     save_path = "/valohai/outputs/data.yaml"

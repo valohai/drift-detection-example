@@ -13,6 +13,8 @@ random.seed(10)
 
 
 def save_dataset(out_path, subset="train"):
+    print(f"Saving metadata for {subset} subset")
+
     out_path = out_path[:-1]
     project_name, exec_id = get_run_identification()
 
@@ -26,6 +28,7 @@ def save_dataset(out_path, subset="train"):
         ],
     }
 
+    # The metadata must be saved for each file
     for folder in os.listdir(out_path + "/" + subset):
         for file in os.listdir(out_path + "/" + subset + "/" + folder):
             metadata_path = os.path.join(
@@ -43,6 +46,8 @@ def prepare_data(data_path, save_path, train_size, valid_size, test_size, image_
     data_path = os.path.join(data_path, os.listdir(data_path)[0])
 
     for subset, size in sets.items():
+        print(f"Preparing {size} sample for {subset} subset")
+
         img_files_path = os.path.join(data_path, f"{subset}/images")
         lbl_files_path = os.path.join(data_path, f"{subset}/labels")
 
@@ -52,6 +57,7 @@ def prepare_data(data_path, save_path, train_size, valid_size, test_size, image_
         image_files = os.listdir(img_files_path)
         random_images = random.sample(image_files, size)
 
+        # Moving the images and labels to Valohai outputs, so they uploaded and versioned in Valohai
         for i, image_file in enumerate(random_images):
             image_path = os.path.join(img_files_path, image_file)
             image = cv2.imread(image_path)
@@ -62,7 +68,7 @@ def prepare_data(data_path, save_path, train_size, valid_size, test_size, image_
                 lbl_files_path + f"/{image_file[:-3]}txt",
                 lbl_destination_path.path("."),
             )
-
+        # Save as Valohai dataset
         save_dataset(save_path, subset)
 
 
@@ -106,10 +112,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     dataset_packed = valohai.inputs("dataset").path(process_archives=False)
-    print("dataset_packed ", dataset_packed)
+    print("Got packed dataset ", dataset_packed)
 
     output_path = valohai.outputs("prep_dataset").path(".")
+    print("Unpacking...  ")
+
     unpacked_dataset_path = unpack_dataset(dataset_packed, "unpacked_dataset")
+    print("Unpacked to ", unpacked_dataset_path)
 
     prepare_data(
         unpacked_dataset_path,
@@ -119,3 +128,4 @@ if __name__ == "__main__":
         args.test_size,
         args.image_size,
     )
+    print("Dataset is prepared!")

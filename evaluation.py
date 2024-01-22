@@ -6,9 +6,11 @@ from ultralytics import YOLO
 
 
 def save_to_outputs():
+    print("Saving to Valohai")
+
     path = "runs/detect/val"
     save_path = valohai.outputs("detections")
-    print("save_path ", save_path)
+
     for f in os.listdir(path):
         src = os.path.join(path, f)
         dst = save_path.path(f)
@@ -28,6 +30,7 @@ def evaluate_yolo():
         split="test",
         plots=True,
     )
+    print("Results: ")
     print("map50-95", metrics.box.map)  # map50-95
     print("map50", metrics.box.map50)  # map50
     print("map75", metrics.box.map75)  # map75
