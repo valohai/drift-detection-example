@@ -41,7 +41,7 @@
         default: dataset://drift-demo-ships-aerial/dev_valid
     parameters:
       - name: yolo_model_name
-        default: 'yolov8x.pt'
+        default: "yolov8x.pt"
         type: string
       - name: epochs
         default: 3
@@ -115,9 +115,9 @@
     command:
       - python call-retrain.py {parameters}
     parameters:
-    - name: save_results
-      default: 0
-      type: integer
+      - name: save_results
+        default: 0
+        type: integer
 
 - pipeline:
     name: train-val-pipeline
@@ -152,6 +152,7 @@
           - when: node-starting
             then: require-approval
     edges:
-      - [drift-detect.parameter.save_results, call-retrain.parameter.save_results]
-
-
+      - [
+          drift-detect.parameter.save_results,
+          call-retrain.parameter.save_results,
+        ]
