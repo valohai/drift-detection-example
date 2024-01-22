@@ -1,6 +1,6 @@
 # Drift Detection using WhyLabs
 
-This repository is made to show one of the ways how to detect the data drift when using [Valohai][https://app.valohai.com/]. 
+This repository is made to show one of the ways how to detect the data drift when using [Valohai](https://app.valohai.com/). 
 Here, we use [WhyLabs](https://whylabs.ai/) to generate drift reports for the input image data. We also show how to automaticaly trigger the retraining of the model, how to use human approval to the step in the pipeline, how to use Valohai actions.
 
 ## Drift is..
