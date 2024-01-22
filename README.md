@@ -42,7 +42,7 @@ Consists of two steps:
           <p align="center"><img src="./screenshots/summary_report.jpg" width="550" alt="Summary Drift Report" /></p>
   _Note: We set a threshold on the number of image characteristics showing drift in WhyLabs. Once this threshold is reached, we initiate the training pipeline._
   6. If drift is detected, change Status detail. <p align="center"><img src="./screenshots/status_detail.jpg" width="550" alt="Status Detail updated" /></p>
-  7. if drift is detected, then the pipeline is stopped ([Valohai actions docs](https://docs.valohai.com/hc/en-us/articles/18704272477841-Conditions), see `valohai.yaml` -> `drift-detection-pipeline`)
+  7. if drift is not detected, then the pipeline is stopped ([Valohai actions docs](https://docs.valohai.com/hc/en-us/articles/18704272477841-Conditions), see `valohai.yaml` -> `drift-detection-pipeline`)
 - Call retrain
   1. Only if on the previous step the drift was detected, the node starts.
   2. When the node is starting it will require human approval ([Valohai actions docs](https://docs.valohai.com/hc/en-us/articles/18704272477841-Conditions)) <p align="center"><img src="./screenshots/human_approval.jpg" width="550" alt="Human Approval" /></p>
