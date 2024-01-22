@@ -32,7 +32,7 @@ def save_dataset(out_path, subset='train'):
                 json.dump(metadata, outfile)
 
 
-def prepare_data(data_path, save_path, train_size=20, valid_size=5, test_size=5, image_size=(768, 768)):
+def prepare_data(data_path, save_path, train_size, valid_size, test_size, image_size):
     sets = {'train': train_size, 'valid': valid_size, 'test': test_size}
     data_path = os.path.join(data_path, os.listdir(data_path)[0])
 
@@ -50,7 +50,7 @@ def prepare_data(data_path, save_path, train_size=20, valid_size=5, test_size=5,
         for i, image_file in enumerate(random_images):
             image_path = os.path.join(img_files_path, image_file)
             image = cv2.imread(image_path)
-            image = preprocess(image)
+            image = preprocess(image, image_size)
             cv2.imwrite(img_destination_path.path(image_file), image)
 
             shutil.move(lbl_files_path + f'/{image_file[:-3]}txt', lbl_destination_path.path('.'))
@@ -58,11 +58,14 @@ def prepare_data(data_path, save_path, train_size=20, valid_size=5, test_size=5,
         save_dataset(save_path, subset)
 
 
-def preprocess(img, img_size=608):
+def preprocess(img, img_size):
+    img = cv2.resize(img, (img_size, img_size))
+
+    # Possible preprocess - We proceed without since ultralytics manages that under the hood.
     # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    # img = cv2.resize(img, (img_size, img_size))
     # img = img / 255.
     return img
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Dataset parameters for ship aerial images")
