@@ -1,6 +1,6 @@
 - step:
     name: prepare_data
-    environment: staging-aws-eu-west-1-p3-2xlarge
+    environment: aws-eu-west-1-g4dn-xlarge
     image: ultralytics/yolov5
     command:
       - pip install valohai-utils
@@ -27,7 +27,7 @@
 
 - step:
     name: train_model
-    environment: staging-aws-eu-west-1-p3-2xlarge
+    environment: aws-eu-west-1-g4dn-xlarge
     image: ultralytics/yolov5
     command:
       - pip install valohai-utils
@@ -69,7 +69,7 @@
 - step:
     name: evaluation
     image: ultralytics/yolov5
-    environment: staging-aws-eu-west-1-p3-2xlarge
+    environment: aws-eu-west-1-g4dn-xlarge
     command:
       - pip install valohai-utils
       - python evaluation.py {parameters}
@@ -86,7 +86,7 @@
 - step:
     name: inference
     image: ultralytics/yolov5
-    environment: staging-aws-eu-west-1-p2-xlarge
+    environment: aws-eu-west-1-p3-2xlarge
     command:
       - pip install "whylogs[image,viz]"
       - pip install valohai-utils
@@ -110,8 +110,7 @@
 
 - step:
     name: call-retrain
-    image: ultralytics/yolov5
-    environment: staging-aws-eu-west-1-p3-2xlarge
+    environment: aws-eu-west-1-p3-2xlarge
     command:
       - python call-retrain.py {parameters}
     parameters:
@@ -152,7 +151,5 @@
           - when: node-starting
             then: require-approval
     edges:
-      - [
-          drift-detect.parameter.save_results,
-          call-retrain.parameter.save_results,
-        ]
+      - [drift-detect.parameter.save_results]
+      - [call-retrain.parameter.save_results]
