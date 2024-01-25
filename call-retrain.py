@@ -2,8 +2,8 @@ import os
 
 import requests
 
-api_token = os.environ.get("VALOHAI_API_TOKEN")
-project_id = os.environ.get("VH_PROJECT_ID")
+api_token = os.environ["VALOHAI_API_TOKEN"]
+project_id = os.environ["VH_PROJECT_ID"]
 
 resp = requests.request(
     url="https://app.valohai.com/api/v0/pipelines/create-from-template/",
