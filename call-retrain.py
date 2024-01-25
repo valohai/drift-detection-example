@@ -3,12 +3,14 @@ import os
 import requests
 
 api_token = os.environ.get("VALOHAI_API_TOKEN")
+project_id = os.environ.get("VH_PROJECT_ID")
+
 resp = requests.request(
     url="https://app.valohai.com/api/v0/pipelines/create-from-template/",
     method="POST",
     headers={"Authorization": f"Token {api_token}"},
     json={
-        "project": "018d30f4-d4fc-91f6-f67b-6ab28f72f3f8",
+        "project": project_id,
         "commit": "0aadea924a866f2fd95b5ea304c2a8f7fd0cc189",
         "name": "train-val-pipeline"
     }
