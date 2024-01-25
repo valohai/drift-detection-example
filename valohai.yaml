@@ -151,5 +151,7 @@
           - when: node-starting
             then: require-approval
     edges:
-      - [drift-detect.parameter.save_results]
-      - [call-retrain.parameter.save_results]
+      - [
+          drift-detect.parameter.save_results,
+          call-retrain.parameter.save_results,
+        ]
