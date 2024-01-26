@@ -12,11 +12,10 @@ resp = requests.request(
     json={
         "project": project_id,
         "commit": "0aadea924a866f2fd95b5ea304c2a8f7fd0cc189",
-        "name": "train-val-pipeline"
-    }
+        "name": "train-val-pipeline",
+    },
 )
 if resp.status_code == 400:
     raise RuntimeError(resp.json())
 resp.raise_for_status()
 data = resp.json()
-
