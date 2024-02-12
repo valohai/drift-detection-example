@@ -86,7 +86,7 @@
 - step:
     name: inference
     image: ultralytics/yolov5
-    environment: aws-eu-west-1-p3-2xlarge
+    environment: aws-eu-west-1-p2-xlarge
     command:
       - pip install "whylogs[image,viz]"
       - pip install valohai-utils
@@ -110,8 +110,9 @@
 
 - step:
     name: call-retrain
-    environment: aws-eu-west-1-p3-2xlarge
+    image: python:3.9
     command:
+      - pip install requests
       - python call-retrain.py {parameters}
     parameters:
       - name: save_results
