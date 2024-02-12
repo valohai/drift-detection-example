@@ -112,6 +112,7 @@
     name: call-retrain
     image: python:3.9
     command:
+      - pip install requests
       - python call-retrain.py {parameters}
     parameters:
       - name: save_results
