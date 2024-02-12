@@ -86,7 +86,7 @@
 - step:
     name: inference
     image: ultralytics/yolov5
-    environment: aws-eu-west-1-p3-2xlarge
+    environment: aws-eu-west-1-p2-xlarge
     command:
       - pip install "whylogs[image,viz]"
       - pip install valohai-utils
