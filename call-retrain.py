@@ -11,7 +11,7 @@ resp = requests.request(
     headers={"Authorization": f"Token {api_token}"},
     json={
         "project": project_id,
-        "commit": "0aadea924a866f2fd95b5ea304c2a8f7fd0cc189",
+        "commit": "main",
         "name": "train-val-pipeline",
     },
 )
