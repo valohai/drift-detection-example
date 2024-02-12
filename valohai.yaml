@@ -110,7 +110,7 @@
 
 - step:
     name: call-retrain
-    environment: aws-eu-west-1-p3-2xlarge
+    image: python:3.9
     command:
       - python call-retrain.py {parameters}
     parameters:
