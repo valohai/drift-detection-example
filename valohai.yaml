@@ -7,7 +7,7 @@
       - python data-preprocess.py {parameters}
     inputs:
       - name: dataset
-        default: s3://valohai-demo-library-data/drift-detection/ships-aerial-images.zip
+        default: https://valohai-demo-library-data.s3.eu-west-1.amazonaws.com/drift-detection/ships-aerial-images.zip
     parameters:
       - name: train_size
         default: 15
@@ -93,7 +93,7 @@
       - python inference.py {parameters}
     inputs:
       - name: data
-        default: s3://valohai-demo-library-data/drift-detection/drifted_colorspace.zip
+        default: https://valohai-demo-library-data.s3.eu-west-1.amazonaws.com/drift-detection/drifted_colorspace.zip
       - name: ref_data
         default: dataset://drift-demo-ships-aerial/dev_valid
       - name: model
