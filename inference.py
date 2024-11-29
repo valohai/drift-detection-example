@@ -1,15 +1,20 @@
-import datetime
-import glob
 import os
+import glob
+import datetime
+import requests
 
-import valohai
 from PIL import Image
 from ultralytics import YOLO
 from whylogs.api.writer.whylabs import WhyLabsWriter
+from whylogs.core import DatasetProfileView
 from whylogs.extras.image_metric import log_image
 from whylogs.viz import NotebookProfileVisualizer
 from whylogs.viz.drift.column_drift_algorithms import calculate_drift_scores
+from whylabs_client import ApiClient, Configuration
+from whylabs_client.api import dataset_profile_api
+from whylabs_client.model.reference_profile_item_response import ReferenceProfileItemResponse
 
+import valohai
 from helpers import unpack_dataset
 
 
@@ -41,7 +46,7 @@ def inference_yolo(data_path):
         else:
             inference_profile = inference_profile.merge(profile_view)
 
-        if valohai.parameters("save_results").value != 1:
+        if valohai.parameters("save_results").value:
             # Save the result to Valohai
             image_name = os.path.basename(path)
             im_array = res.plot()  # plot a BGR numpy array of predictions
@@ -55,7 +60,9 @@ def inference_yolo(data_path):
     return inference_profile
 
 
-def load_reference_data():
+def load_reference_data_from_inputs():
+    print("----Loading reference data from inputs 'ref_data'...")
+
     jpg_paths = glob.glob("/valohai/inputs/ref_data/*.jpg")
     png_paths = glob.glob("/valohai/inputs/ref_data/*.png")
     data_list = jpg_paths + png_paths
@@ -76,10 +83,59 @@ def load_reference_data():
         else:
             reference_profile = reference_profile.merge(profile_view)
 
-    print(f"Reference profile {len(data_list)} images")
+    print(f"Reference profile {len(data_list)} images is created")
     writer = WhyLabsWriter()
+    writer.option(reference_profile_name=valohai.parameters('reference_profile_output_name').value)
     writer.write(reference_profile)
     return reference_profile
+
+
+def load_reference_data_from_whylabs():
+    print('----Loading reference data from WhyLabs...')
+    # Load necessary values from environment variables
+    ORG_ID = os.getenv("WHYLABS_DEFAULT_ORG_ID")
+    MODEL_ID = os.getenv("WHYLABS_DEFAULT_DATASET_ID")
+    API_KEY = os.getenv("WHYLABS_API_KEY")
+    REF_ID = os.getenv("WHYLABS_REF_ID")
+
+    if not all([ORG_ID, MODEL_ID, API_KEY, REF_ID]):
+        raise EnvironmentError("Missing one or more required environment variables: "
+                               "WHYLABS_DEFAULT_ORG_ID, WHYLABS_DEFAULT_DATASET_ID, WHYLABS_API_KEY, REF_ID")
+
+    # Configure the API client
+    configuration = Configuration(
+        host="https://api.whylabsapp.com",
+    )
+    configuration.api_key['ApiKeyAuth'] = API_KEY
+
+    # Enter a context with an instance of the API client
+    with ApiClient(configuration) as api_client:
+        # Create an instance of the DatasetProfileApi class
+        api_instance = dataset_profile_api.DatasetProfileApi(api_client)
+
+        try:
+            # Call the API to get the reference profile metadata
+            api_response: ReferenceProfileItemResponse = api_instance.get_reference_profile(
+                org_id=ORG_ID,
+                model_id=MODEL_ID,
+                reference_id=REF_ID
+            )
+
+            # Download the profile from the provided URL
+            download_url = api_response.download_url
+            response = requests.get(download_url)
+
+            if response.status_code == 200:
+                # Deserialize the binary content into a DatasetProfileView
+                reference_profile = DatasetProfileView.deserialize(response.content)
+                print(f"Successfully loaded reference profile: {REF_ID}")
+                return reference_profile
+            else:
+                raise Exception(f"Failed to download reference profile: {response.status_code} {response.text}")
+
+        except Exception as e:
+            print(f"Exception when calling DatasetProfileApi->get_reference_profile: {e}")
+            raise
 
 
 def generate_data_drift_report(inference_profile, reference_profile):
@@ -96,7 +152,7 @@ def generate_data_drift_report(inference_profile, reference_profile):
         preferred_path="/valohai/outputs/",
         html_file_name="summary_drift_report",
     )
-    print("----Saved Generated Report to valohai/outputs/")
+    print("----Saved Generated Report to /valohai/outputs/")
 
     scores = calculate_drift_scores(
         target_view=inference_profile,
@@ -139,7 +195,9 @@ if __name__ == "__main__":
     print("----Running YOLO inference")
     inference_profile = inference_yolo(data_path)
 
-    reference_profile = load_reference_data()
-    print("----Generated reference_profile")
+    if valohai.parameters("use_whylabs_reference_profile").value:
+        reference_profile = load_reference_data_from_whylabs()
+    else:
+        reference_profile = load_reference_data_from_inputs()
 
     generate_data_drift_report(inference_profile, reference_profile)
