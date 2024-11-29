@@ -86,7 +86,6 @@
 - step:
     name: inference
     image: ultralytics/yolov5
-    environment: aws-eu-west-1-p2-xlarge
     command:
       - pip install "whylogs[image,viz]"
       - pip install valohai-utils
@@ -100,13 +99,24 @@
         default: datum://model-current-best
     environment-variables:
       - name: WHYLABS_DEFAULT_ORG_ID
-        default: "org-tXvte7"
+        default: org-BfZcPw
       - name: WHYLABS_DEFAULT_DATASET_ID
-        default: "model-1"
+        default: "model-4"
+      - name: WHYLABS_REF_ID
+        default: ref-ijWFMLXVQqmRM9i4
     parameters:
-      - name: save_results
-        default: 1
-        type: integer
+      - name: use_whylabs_reference_profile
+        default: True
+        type: flag
+        description: Indicates whether to load the reference profile from WhyLabs. If False, the reference profile will be created based on the provided input data (`ref_data`).
+      - name: reference_profile_output_name
+        default: yolo_example_reference_profile
+        type: string
+        description: The name used to save the reference profile if it is generated from the provided input data. This is ignored if `use_whylabs_reference_profile` is True.
+      - name: export_inference_results
+        default: True
+        type: flag
+        description: Determines whether the results of the YOLO inference should be saved to the outputs directory.
 
 - step:
     name: call-retrain
