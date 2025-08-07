@@ -3,6 +3,8 @@
 This repository is made to show one of the ways how to detect the data drift when using [Valohai](https://app.valohai.com/).
 Here, we use [WhyLabs](https://whylabs.ai/) to generate drift reports for the input image data. We also show how to automaticaly trigger the retraining of the model, how to use human approval to the step in the pipeline, how to use Valohai actions.
 
+👉 **Watch this video** for a detailed explanation of the Valohai x WhyLabs integration: [Loom Video](https://www.loom.com/share/d9b02b23c27b46b8931200724606bec6?sid=96a459b4-5bc9-4800-ba6b-e8a69fdf28fd)
+
 ## Drift is..
 
 Drift in machine learning refers to a change over time in input data or the relationship between input and output data, impacting model performance. Drift can lead to reduced model accuracy as the model becomes less effective over time, necessitating regular updates.
