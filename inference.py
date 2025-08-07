@@ -1,20 +1,20 @@
-import os
-import glob
 import datetime
-import requests
+import glob
+import os
 
+import requests
+import valohai
 from PIL import Image
 from ultralytics import YOLO
+from whylabs_client import ApiClient, Configuration
+from whylabs_client.api import dataset_profile_api
+from whylabs_client.model.reference_profile_item_response import ReferenceProfileItemResponse
 from whylogs.api.writer.whylabs import WhyLabsWriter
 from whylogs.core import DatasetProfileView
 from whylogs.extras.image_metric import log_image
 from whylogs.viz import NotebookProfileVisualizer
 from whylogs.viz.drift.column_drift_algorithms import calculate_drift_scores
-from whylabs_client import ApiClient, Configuration
-from whylabs_client.api import dataset_profile_api
-from whylabs_client.model.reference_profile_item_response import ReferenceProfileItemResponse
 
-import valohai
 from helpers import unpack_dataset
 
 
@@ -85,13 +85,13 @@ def load_reference_data_from_inputs():
 
     print(f"Reference profile {len(data_list)} images is created")
     writer = WhyLabsWriter()
-    writer.option(reference_profile_name=valohai.parameters('reference_profile_output_name').value)
+    writer.option(reference_profile_name=valohai.parameters("reference_profile_output_name").value)
     writer.write(reference_profile)
     return reference_profile
 
 
 def load_reference_data_from_whylabs():
-    print('----Loading reference data from WhyLabs...')
+    print("----Loading reference data from WhyLabs...")
     # Load necessary values from environment variables
     ORG_ID = os.getenv("WHYLABS_DEFAULT_ORG_ID")
     MODEL_ID = os.getenv("WHYLABS_DEFAULT_DATASET_ID")
@@ -99,14 +99,16 @@ def load_reference_data_from_whylabs():
     REF_ID = os.getenv("WHYLABS_REF_ID")
 
     if not all([ORG_ID, MODEL_ID, API_KEY, REF_ID]):
-        raise EnvironmentError("Missing one or more required environment variables: "
-                               "WHYLABS_DEFAULT_ORG_ID, WHYLABS_DEFAULT_DATASET_ID, WHYLABS_API_KEY, REF_ID")
+        raise EnvironmentError(
+            "Missing one or more required environment variables: "
+            "WHYLABS_DEFAULT_ORG_ID, WHYLABS_DEFAULT_DATASET_ID, WHYLABS_API_KEY, REF_ID",
+        )
 
     # Configure the API client
     configuration = Configuration(
         host="https://api.whylabsapp.com",
     )
-    configuration.api_key['ApiKeyAuth'] = API_KEY
+    configuration.api_key["ApiKeyAuth"] = API_KEY
 
     # Enter a context with an instance of the API client
     with ApiClient(configuration) as api_client:
@@ -118,7 +120,7 @@ def load_reference_data_from_whylabs():
             api_response: ReferenceProfileItemResponse = api_instance.get_reference_profile(
                 org_id=ORG_ID,
                 model_id=MODEL_ID,
-                reference_id=REF_ID
+                reference_id=REF_ID,
             )
 
             # Download the profile from the provided URL
